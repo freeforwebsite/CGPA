@@ -10,9 +10,9 @@ const upload = multer({
   limits: { fileSize: 4 * 1024 * 1024 } // keep under Vercel's request body limit
 });
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_MODEL = 'gpt-4o';
-const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
 const SYSTEM_PROMPT = `You are analyzing a college semester result / marksheet PDF from an Indian engineering college on a 10-point grading scale (O=10, A+=9, A=8, B+=7, B=6, C=5, U/RA/F/W=0 fail).
 
@@ -36,54 +36,44 @@ async function handleParse(req, res) {
     if (!req.file) {
       return res.status(400).json({ success: false, error: 'No file uploaded' });
     }
-    if (!OPENAI_API_KEY) {
-      return res.status(500).json({ success: false, error: 'Server missing OPENAI_API_KEY' });
+    if (!GEMINI_API_KEY) {
+      return res.status(500).json({ success: false, error: 'Server missing GEMINI_API_KEY' });
     }
 
     const base64Pdf = req.file.buffer.toString('base64');
 
     const body = {
-      model: OPENAI_MODEL,
-      temperature: 0,
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
+      contents: [
         {
-          role: 'user',
-          content: [
-            { type: 'text', text: 'Analyze this result PDF and extract the subjects as instructed.' },
-            {
-              type: 'file',
-              file: {
-                filename: req.file.originalname || 'result.pdf',
-                file_data: `data:application/pdf;base64,${base64Pdf}`
-              }
-            }
+          parts: [
+            { text: SYSTEM_PROMPT },
+            { inline_data: { mime_type: 'application/pdf', data: base64Pdf } }
           ]
         }
-      ]
+      ],
+      generationConfig: {
+        temperature: 0,
+        responseMimeType: 'application/json'
+      }
     };
 
-    const openaiRes = await fetch(OPENAI_URL, {
+    const geminiRes = await fetch(GEMINI_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
 
-    if (!openaiRes.ok) {
-      const errText = await openaiRes.text();
-      console.error('OpenAI API error:', openaiRes.status, errText);
+    if (!geminiRes.ok) {
+      const errText = await geminiRes.text();
+      console.error('Gemini API error:', geminiRes.status, errText);
       return res.status(502).json({ success: false, error: 'AI service error' });
     }
 
-    const data = await openaiRes.json();
-    const textOut = data?.choices?.[0]?.message?.content;
+    const data = await geminiRes.json();
+    const textOut = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!textOut) {
-      console.error('No text in OpenAI response:', JSON.stringify(data));
+      console.error('No text in Gemini response:', JSON.stringify(data));
       return res.status(502).json({ success: false, error: 'No response from AI' });
     }
 
