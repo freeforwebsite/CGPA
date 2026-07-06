@@ -432,7 +432,13 @@
     color:var(--muted-2);
     margin-top:6px;
   }
-  .col-labels span:nth-child(2), .col-labels span:nth-child(3){text-align:center;}
+  .col-labels span{
+    display: block;
+    width: 100%;
+  }
+  .col-labels span:nth-child(2), .col-labels span:nth-child(3){
+    text-align:center;
+  }
 
   .sem-foot{
     display:flex;
