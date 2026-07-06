@@ -11,8 +11,7 @@ const upload = multer({
 });
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = 'gemini-2.0-flash';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-1.5-flash'];
 
 const SYSTEM_PROMPT = `You are analyzing a college semester result / marksheet PDF from an Indian engineering college on a 10-point grading scale (O=10, A+=9, A=8, B+=7, B=6, C=5, U/RA/F/W=0 fail).
 
@@ -57,16 +56,37 @@ async function handleParse(req, res) {
       }
     };
 
-    const geminiRes = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+    let geminiRes;
+    let lastError = '';
+    let success = false;
 
-    if (!geminiRes.ok) {
-      const errText = await geminiRes.text();
-      console.error('Gemini API error:', geminiRes.status, errText);
-      return res.status(502).json({ success: false, error: 'AI service error' });
+    for (const model of GEMINI_MODELS) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+      console.log(`Attempting analysis with Gemini model: ${model}...`);
+      try {
+        geminiRes = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        if (geminiRes.ok) {
+          success = true;
+          break;
+        } else {
+          const errText = await geminiRes.text();
+          lastError = `Model ${model} returned status ${geminiRes.status}: ${errText}`;
+          console.error(lastError);
+        }
+      } catch (e) {
+        lastError = `Fetch error with model ${model}: ${e.message}`;
+        console.error(lastError);
+      }
+    }
+
+    if (!success) {
+      console.error('All Gemini models failed. Last error:', lastError);
+      return res.status(502).json({ success: false, error: 'AI service error: ' + lastError });
     }
 
     const data = await geminiRes.json();

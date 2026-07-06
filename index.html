@@ -526,6 +526,188 @@
     .subject-row{grid-template-columns: 1fr 52px 68px 26px;}
     .col-labels{grid-template-columns: 1fr 52px 68px 26px;}
   }
+
+  /* ---------- Dashboard Summary ---------- */
+  .dashboard-summary {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .dash-title {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gold-soft);
+    margin-bottom: 12px;
+    letter-spacing: 0.02em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .dash-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+  }
+  .dash-item {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 8px 10px;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+  .dash-item:hover {
+    border-color: rgba(207,160,74,0.3);
+    background: rgba(207,160,74,0.03);
+  }
+  .dash-sem-name {
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+  }
+  .dash-sem-gpa {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* ---------- Chart Container ---------- */
+  .chart-container {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .chart-title {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gold-soft);
+    margin-bottom: 12px;
+    letter-spacing: 0.02em;
+  }
+  .chart-svg {
+    width: 100%;
+    height: 140px;
+    display: block;
+  }
+  .chart-line {
+    fill: none;
+    stroke: var(--gold-soft);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .chart-point {
+    fill: var(--ink);
+    stroke: var(--maroon-bright);
+    stroke-width: 2.5;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .chart-point:hover {
+    fill: var(--gold-soft);
+    stroke: #fff;
+    r: 6;
+  }
+  .chart-grid-line {
+    stroke: rgba(255,255,255,0.035);
+    stroke-width: 1;
+    stroke-dasharray: 4,4;
+  }
+  .chart-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    fill: var(--muted);
+    text-anchor: middle;
+  }
+
+  /* ---------- Print Stylesheet ---------- */
+  @media print {
+    body {
+      background: #fff !important;
+      color: #000 !important;
+      padding: 0 !important;
+    }
+    .wrap {
+      max-width: 100% !important;
+    }
+    .seal-stage {
+      padding: 10px 0 !important;
+    }
+    .seal::before, .seal::after {
+      border-color: #000 !important;
+      box-shadow: none !important;
+    }
+    .seal-value, .seal-label, .seal-scale {
+      color: #000 !important;
+    }
+    .credits-earned b {
+      color: #000 !important;
+    }
+    .import-block, .review-panel, .add-semester, #resetBtn, #addSemBtn, .sem-foot, .col-labels span:last-child, .subject-row button {
+      display: none !important;
+    }
+    .semester {
+      background: none !important;
+      border: 1px solid #ddd !important;
+      break-inside: avoid;
+    }
+    .subject-row {
+      grid-template-columns: 1fr 80px 80px !important;
+    }
+    .col-labels {
+      grid-template-columns: 1fr 80px 80px !important;
+      color: #333 !important;
+    }
+    .subject-row input, .subject-row select {
+      background: none !important;
+      border: none !important;
+      color: #000 !important;
+      padding: 0 !important;
+      pointer-events: none;
+    }
+    .sem-name-input {
+      color: #000 !important;
+    }
+    .sem-sgpa b {
+      color: #000 !important;
+    }
+    .dashboard-summary, .chart-container {
+      border: 1px solid #ddd !important;
+      background: none !important;
+      color: #000 !important;
+    }
+    .dash-item {
+      border: 1px solid #ddd !important;
+      background: none;
+    }
+    .dash-sem-gpa, .dash-sem-name {
+      color: #000 !important;
+    }
+    .chart-line {
+      stroke: #000 !important;
+    }
+    .chart-point {
+      stroke: #000 !important;
+      fill: #fff !important;
+    }
+    .chart-text {
+      fill: #000 !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -555,15 +737,25 @@
   </div>
   <div class="credits-earned" id="creditsLine">0 credits across 0 semesters</div>
 
+  <!-- Summary Dashboard -->
+  <div id="dashboardSummary" class="dashboard-summary" style="display:none;"></div>
+
+  <!-- SVG SGPA Trend Chart -->
+  <div id="chartContainer" class="chart-container" style="display:none;"></div>
+
   <div id="semesters"></div>
 
-  <button class="add-semester" id="addSemBtn" type="button">+ Add semester</button>
+  <!-- Action Buttons -->
+  <div style="display: flex; gap: 12px; margin-bottom: 24px; margin-top: 6px;">
+    <button class="add-semester" id="addSemBtn" type="button" style="margin-bottom:0; flex: 2;">+ Add semester</button>
+    <button class="add-semester" id="resetBtn" type="button" style="margin-bottom:0; flex: 1; border-color: rgba(255,255,255,0.15); color: var(--muted);">✕ Reset</button>
+  </div>
 
   <div class="import-block">
     <label class="import-btn" for="pdfInput">
-      <span>⇧ Import from result PDF</span>
+      <span>⇧ Import from result PDF(s)</span>
     </label>
-    <input type="file" id="pdfInput" accept="application/pdf" hidden>
+    <input type="file" id="pdfInput" accept="application/pdf" multiple hidden>
     <div class="import-note">AI reads your result PDF — even scanned copies — and pulls out subjects, credits, and grades. You'll get to check everything before it's added.</div>
     <div class="import-status" id="importStatus"></div>
   </div>
@@ -756,6 +948,8 @@
         const semId = parseInt(e.target.dataset.sem);
         const sem = state.find(s=>s.id===semId);
         sem.name = e.target.value;
+        updateDashboard();
+        saveState();
       });
     });
 
@@ -788,12 +982,147 @@
     const { creditSum, cgpa } = computeOverall();
     cgpaValueEl.textContent = cgpa.toFixed(2);
     creditsLineEl.innerHTML = `<b>${creditSum}</b> credits across <b>${state.length}</b> semester${state.length===1?'':'s'}`;
+    updateDashboard();
+    updateChart();
+    saveState();
+  }
+
+  function saveState(){
+    try {
+      localStorage.setItem('cgpa_calculator_state', JSON.stringify(state));
+    } catch(e) {
+      console.error('Failed to save state to localStorage:', e);
+    }
+  }
+
+  function loadState(){
+    try {
+      const saved = localStorage.getItem('cgpa_calculator_state');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          state.length = 0;
+          parsed.forEach(sem => {
+            semCounter = Math.max(semCounter, sem.id);
+            sem.rows.forEach(row => {
+              rowCounter = Math.max(rowCounter, row.id);
+            });
+            state.push(sem);
+          });
+          return true;
+        }
+      }
+    } catch(e) {
+      console.error('Failed to load state from localStorage:', e);
+    }
+    return false;
+  }
+
+  function updateDashboard() {
+    const dashboardSummary = document.getElementById('dashboardSummary');
+    if (state.length === 0) {
+      dashboardSummary.style.display = 'none';
+      return;
+    }
+    dashboardSummary.style.display = 'block';
+    
+    let html = `<div class="dash-title"><span>GPA & CGPA Summary</span><span style="font-family:'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); font-weight: normal;">CGPA: ${computeOverall().cgpa.toFixed(2)}</span></div>`;
+    html += `<div class="dash-grid">`;
+    
+    state.forEach(sem => {
+      const { sgpa } = computeSemester(sem);
+      html += `
+        <div class="dash-item">
+          <div class="dash-sem-name" title="${escapeAttr(sem.name)}">${sem.name}</div>
+          <div class="dash-sem-gpa">${sgpa.toFixed(2)}</div>
+        </div>
+      `;
+    });
+    
+    html += `</div>`;
+    dashboardSummary.innerHTML = html;
+  }
+
+  function updateChart() {
+    const chartContainer = document.getElementById('chartContainer');
+    if (state.length < 2) {
+      chartContainer.style.display = 'none';
+      return;
+    }
+    chartContainer.style.display = 'block';
+
+    const width = 500;
+    const height = 100;
+    const paddingX = 40;
+    const paddingY = 15;
+
+    const data = state.map((sem, idx) => {
+      const { sgpa } = computeSemester(sem);
+      return { label: romanize(idx + 1), val: sgpa };
+    });
+
+    const minVal = 0;
+    const maxVal = 10;
+
+    const getX = (index) => {
+      if (data.length === 1) return width / 2;
+      return paddingX + (index * (width - 2 * paddingX) / (data.length - 1));
+    };
+
+    const getY = (val) => {
+      return height - paddingY - (val * (height - 2 * paddingY) / maxVal);
+    };
+
+    let svgContent = '';
+    
+    [2.5, 5, 7.5, 10].forEach(gridVal => {
+      const y = getY(gridVal);
+      svgContent += `<line x1="${paddingX - 10}" y1="${y}" x2="${width - paddingX + 10}" y2="${y}" class="chart-grid-line" />`;
+      svgContent += `<text x="${paddingX - 20}" y="${y + 3}" class="chart-text" style="text-anchor: end; font-size: 8px;">${gridVal}</text>`;
+    });
+
+    let points = '';
+    data.forEach((d, idx) => {
+      points += `${getX(idx)},${getY(d.val)} `;
+    });
+
+    svgContent += `<polyline points="${points.trim()}" class="chart-line" />`;
+
+    data.forEach((d, idx) => {
+      const x = getX(idx);
+      const y = getY(d.val);
+      svgContent += `
+        <circle cx="${x}" cy="${y}" r="4.5" class="chart-point" />
+        <text x="${x}" y="${y - 10}" class="chart-text" style="fill: var(--text); font-weight: 600;">${d.val.toFixed(2)}</text>
+        <text x="${x}" y="${height - 2}" class="chart-text">Sem ${d.label}</text>
+      `;
+    });
+
+    chartContainer.innerHTML = `
+      <div class="chart-title">SGPA Progression</div>
+      <svg viewBox="0 0 ${width} ${height}" class="chart-svg">
+        ${svgContent}
+      </svg>
+    `;
   }
 
   document.getElementById('addSemBtn').addEventListener('click', addSemester);
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    if (confirm("Are you sure you want to clear all semesters?")) {
+      localStorage.removeItem('cgpa_calculator_state');
+      state.length = 0;
+      semCounter = 0;
+      rowCounter = 0;
+      addSemester();
+    }
+  });
 
-  // start with one semester
-  addSemester();
+  // load state from localStorage or start with one semester
+  if (!loadState()) {
+    addSemester();
+  } else {
+    render();
+  }
 
   /* ================= PDF import (AI-powered) ================= */
 
@@ -813,56 +1142,68 @@
     importStatusEl.classList.toggle('error', !!isError);
   }
 
-  async function importPdf(file){
+  async function importPdfs(files){
     importPreviewEl.innerHTML = '';
+    setImportStatus('Analyzing PDFs with AI…', false);
+    pendingGroups = [];
+    importIdCounter = 0;
+    
+    let totalFound = 0;
+    let errors = [];
 
-    if(!PARSE_API_URL || PARSE_API_URL.includes('YOUR-BACKEND')){
-      setImportStatus('AI import isn\'t connected yet — set PARSE_API_URL in the code to your deployed backend URL.', true);
+    const promises = Array.from(files).map(async (file, idx) => {
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const res = await fetch(PARSE_API_URL, { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          errors.push(`${file.name}: ${data.error || 'Failed to parse'}`);
+          return;
+        }
+
+        const semesters = data.semesters || [];
+        semesters.forEach((sem, semIdx) => {
+          const rows = (sem.subjects || []).map(sub => {
+            importIdCounter++;
+            return {
+              importId: importIdCounter,
+              name: sub.name || '',
+              credit: sub.credit || 0,
+              grade: sub.grade || 'O',
+              include: true
+            };
+          });
+          totalFound += rows.length;
+          let label = sem.label || `Group ${idx + 1}`;
+          if (files.length > 1) {
+            label = `${label} (${file.name.replace(/\.[^/.]+$/, "")})`;
+          }
+          pendingGroups.push({ key: `${idx}-${semIdx}`, label, rows });
+        });
+      } catch (err) {
+        console.error(err);
+        errors.push(`${file.name}: Couldn't reach AI service`);
+      }
+    });
+
+    await Promise.all(promises);
+
+    if (errors.length > 0 && pendingGroups.length === 0) {
+      setImportStatus(`Failed to analyze: ${errors.join('; ')}`, true);
       return;
     }
 
-    setImportStatus('Analyzing with AI…', false);
-
-    try{
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const res = await fetch(PARSE_API_URL, { method: 'POST', body: formData });
-      const data = await res.json();
-
-      if(!res.ok || !data.success){
-        setImportStatus(data.error || 'Could not analyze this PDF. Please try again.', true);
-        return;
-      }
-
-      const semesters = data.semesters || [];
-      const totalFound = semesters.reduce((a,s)=>a + (s.subjects ? s.subjects.length : 0), 0);
-
-      if(totalFound===0){
-        setImportStatus("The AI couldn't find any subjects in this PDF. Make sure it's a result sheet / marksheet, then try again.", true);
-        return;
-      }
-
-      pendingGroups = semesters.map((sem, idx)=>{
-        const rows = (sem.subjects || []).map(sub=>{
-          importIdCounter++;
-          return {
-            importId: importIdCounter,
-            name: sub.name || '',
-            credit: sub.credit || 0,
-            grade: sub.grade || 'O',
-            include: true
-          };
-        });
-        return { key: idx, label: sem.label || `Group ${idx+1}`, rows };
-      });
-
-      setImportStatus(`Found ${totalFound} subject${totalFound===1?'':'s'} across ${pendingGroups.length} group${pendingGroups.length===1?'':'s'}. Review below, then add.`, false);
-      renderImportPreview();
-    } catch(err){
-      console.error(err);
-      setImportStatus("Couldn't reach the AI service. Check your connection and try again.", true);
+    let statusMsg = `Found ${totalFound} subject${totalFound===1?'':'s'} across ${pendingGroups.length} group${pendingGroups.length===1?'':'s'}.`;
+    if (errors.length > 0) {
+      statusMsg += ` (Some errors occurred: ${errors.length} file(s) failed)`;
     }
+    statusMsg += ` Review below, then add.`;
+    
+    setImportStatus(statusMsg, errors.length > 0);
+    renderImportPreview();
   }
 
   function renderImportPreview(){
@@ -937,6 +1278,13 @@
     });
 
     document.getElementById('reviewConfirmBtn').addEventListener('click', ()=>{
+      const isInitialEmpty = state.length === 1 && state[0].rows.every(r => !r.name.trim());
+      if (isInitialEmpty) {
+        state.length = 0;
+        semCounter = 0;
+        rowCounter = 0;
+      }
+      
       pendingGroups.forEach(group=>{
         const included = group.rows.filter(r=>r.include);
         if(!included.length) return;
@@ -959,8 +1307,8 @@
   }
 
   pdfInput.addEventListener('change', (e)=>{
-    const file = e.target.files[0];
-    if(file) importPdf(file);
+    const files = e.target.files;
+    if(files && files.length > 0) importPdfs(files);
   });
 })();
 </script>
