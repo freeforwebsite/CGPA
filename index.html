@@ -420,23 +420,20 @@
   }
   .row-del:hover{color:var(--danger);}
 
-  .col-labels{
-    display:grid;
-    grid-template-columns: 1fr 62px 78px 30px;
-    gap:8px;
-    padding: 0 16px;
+  .col-labels-row{
     font-family:'IBM Plex Mono', monospace;
     font-size:9.5px;
     text-transform:uppercase;
     letter-spacing:0.08em;
     color:var(--muted-2);
-    margin-top:6px;
+    margin-top:4px;
+    margin-bottom:2px;
   }
-  .col-labels span{
+  .col-labels-row span{
     display: block;
     width: 100%;
   }
-  .col-labels span:nth-child(2), .col-labels span:nth-child(3){
+  .col-labels-row span:nth-child(2), .col-labels-row span:nth-child(3){
     text-align:center;
   }
 
@@ -530,7 +527,6 @@
 
   @media (max-width:380px){
     .subject-row{grid-template-columns: 1fr 52px 68px 26px;}
-    .col-labels{grid-template-columns: 1fr 52px 68px 26px;}
   }
 
   /* ---------- Dashboard Summary ---------- */
@@ -663,7 +659,7 @@
     .credits-earned b {
       color: #000 !important;
     }
-    .import-block, .review-panel, .add-semester, #resetBtn, #addSemBtn, .sem-foot, .col-labels span:last-child, .subject-row button {
+    .import-block, .review-panel, .add-semester, #resetBtn, #addSemBtn, .sem-foot, .col-labels-row span:last-child, .subject-row button {
       display: none !important;
     }
     .semester {
@@ -674,8 +670,7 @@
     .subject-row {
       grid-template-columns: 1fr 80px 80px !important;
     }
-    .col-labels {
-      grid-template-columns: 1fr 80px 80px !important;
+    .col-labels-row {
       color: #333 !important;
     }
     .subject-row input, .subject-row select {
@@ -889,13 +884,13 @@
       `;
       card.appendChild(head);
 
-      const colLabels = document.createElement('div');
-      colLabels.className = 'col-labels';
-      colLabels.innerHTML = `<span>Subject</span><span>Credit</span><span>Grade</span><span></span>`;
-      card.appendChild(colLabels);
-
       const rows = document.createElement('div');
       rows.className = 'rows';
+
+      const colLabels = document.createElement('div');
+      colLabels.className = 'subject-row col-labels-row';
+      colLabels.innerHTML = `<span>Subject</span><span>Credit</span><span>Grade</span><span></span>`;
+      rows.appendChild(colLabels);
 
       sem.rows.forEach((row, i)=>{
         const rowEl = document.createElement('div');
